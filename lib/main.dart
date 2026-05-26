@@ -49,6 +49,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _resetCounter() {
+    setState(() {
+      _counter = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +89,17 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _decrementCounter,
         tooltip: 'decremento',
         child: const Icon(Icons.remove),
+        ),
+     
+        const SizedBox(width: 10),
+        
+        if(_counter != 0)
+        FloatingActionButton(
+          onPressed: _resetCounter,
+          tooltip: 'zerar',
+          child: const Icon(Icons.refresh),
         )
+
         ],
       ),
     );
