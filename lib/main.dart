@@ -70,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
             subtitle: Text(candidate.email),
 
             trailing: Icon(
-              candidate.available ? Icons.check_circle : Icons.cancel_rounded,
+              candidate.available ? Icons.check_circle : Icons.cancel_sharp,
               color: candidate.available ? Colors.green : Colors.red,
             ),
 

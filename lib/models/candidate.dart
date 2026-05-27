@@ -34,7 +34,7 @@ static List<Candidate> Candidates() {
         email: "joaopedro@gmail.com",
         course: "Tec. em inf para internet",
         graduationYear: 2026,
-        available: true,
+        available: false,
       ),
 
 Candidate(
@@ -43,7 +43,7 @@ Candidate(
         email: "nayla.gabrielle@ma.senac.br",
         course: "Técnico em Informática para internet",
         graduationYear: 2026,
-        available: false,
+        available: true,
       ),
 
 Candidate(
@@ -60,7 +60,7 @@ Candidate(
         document: "1234567890",
         email: "elciof739@gmail.com",
         course: "Técnico em Informática para internet",
-        available: false,
+        available: true,
         graduationYear: 2026,
       ),
 
