@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'App da Nayra',
       theme: ThemeData(
         colorScheme: .fromSeed(
-          seedColor: const Color.fromARGB(255, 67, 122, 185),
+          seedColor: const Color.fromARGB(255, 67, 185, 83),
         ),
       ),
       home: const MyHomePage(title: 'Meu primeiro App'),
@@ -61,19 +61,103 @@ class _MyHomePageState extends State<MyHomePage> {
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
 
-            child: ListTile(
-              leading: CircleAvatar(child: Text(candidate.name[0])
-              ),
+            child: Padding(padding: const EdgeInsets.all(12),
 
-            title: Text(candidate.name),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
 
-            subtitle: Text(candidate.email),
+              children: [
+                ListTile(
+                    leading: CircleAvatar(child: Text(candidate.name[0])),
 
-            trailing: Icon(
-              candidate.available ? Icons.check_circle : Icons.cancel_sharp,
-              color: candidate.available ? Colors.green : Colors.red,
+                    title: Text(candidate.name),
+
+                    subtitle: Text(candidate.email),
+
+                    trailing: Icon(
+                      candidate.available
+                          ? Icons.check_circle
+                          : Icons.cancel_sharp,
+                      color: candidate.available ? Colors.green : Colors.red,
+                    ),
+                  ),
+
+                   const Text(
+                    "Habilidade Técnicas",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 0, 0, 0),
+                      fontFamily: "Roboto Mono",
+                      backgroundColor: Color.fromARGB(255, 75, 209, 131),
+
+                    ),
+                   ),
+
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+
+                    children: candidate.technicalSkills.map((skill){
+                    return Chip(
+                     label: Text(
+                      skill,
+
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color.fromARGB(255, 2, 2, 2),
+                      ),
+                     ),
+                     
+                     backgroundColor: const Color.fromARGB(255, 140, 247, 206),
+                     padding: EdgeInsets.zero, 
+
+                    );
+                    }).toList(),
+                    
+                  ),
+
+                 
+                 const Text(
+                    "Habilidade Pessoal",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 0, 0, 0),
+                      fontFamily: "Roboto Mono",
+                      backgroundColor: Color.fromARGB(255, 116, 228, 166),
+                    ),
+                  ),
+
+                 Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+
+                    children: candidate.softSkills.map((skill) {
+                      return Chip(
+                        label: Text(
+                          skill,
+
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color.fromARGB(255, 2, 2, 2),
+                          ),
+                        ),
+
+                        backgroundColor: const Color.fromARGB(
+                          255,
+                          140,
+                          247,
+                          206,
+                        ),
+                        padding: EdgeInsets.zero,
+                      );
+                    }).toList(),
+                  ),
+              ],
+
             ),
-
+           
             ),
           );
         },
