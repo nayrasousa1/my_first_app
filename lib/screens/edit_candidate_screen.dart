@@ -3,30 +3,47 @@ import 'package:flutter/services.dart';
 import 'package:my_first_app/models/candidate.dart';
 import 'package:my_first_app/theme/app_theme.dart';
 
-class CreateCandidateScreen extends StatefulWidget {
-  const CreateCandidateScreen({super.key});
+class EditCandidateScreen extends StatefulWidget {
+  const EditCandidateScreen({super.key, required this.candidate});
+
+  final Candidate candidate;
 
   @override
-  State<CreateCandidateScreen> createState() => _CreateCandidateScreenState();
+  State<EditCandidateScreen> createState() => _EditCandidateScreenState();
 }
 
-class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
+class _EditCandidateScreenState extends State<EditCandidateScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final _nameController = TextEditingController();
-  final _documentController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _courseController = TextEditingController();
-  final _graduationYearController = TextEditingController();
+  late final TextEditingController _nameController;
+  late final TextEditingController _documentController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _courseController;
+  late final TextEditingController _graduationYearController;
   final _technicalSkillController = TextEditingController();
   final _softSkillController = TextEditingController();
 
-  bool _available = true;
-  List<String> _technicalSkills = [];
-  List<String> _softSkills = [];
+  late bool _available;
+  late List<String> _technicalSkills;
+  late List<String> _softSkills;
 
-  // Etapa atual do formulário (stepper)
   int _currentStep = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pré-preenche os campos com os dados do candidato
+    final c = widget.candidate;
+    _nameController = TextEditingController(text: c.name);
+    _documentController = TextEditingController(text: c.document);
+    _emailController = TextEditingController(text: c.email);
+    _courseController = TextEditingController(text: c.course);
+    _graduationYearController =
+        TextEditingController(text: c.graduationYear.toString());
+    _available = c.available;
+    _technicalSkills = List.from(c.technicalSkills);
+    _softSkills = List.from(c.softSkills);
+  }
 
   @override
   void dispose() {
@@ -40,7 +57,7 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
     super.dispose();
   }
 
-  // ── Adicionar/remover habilidades ────────────────────────────────
+  // ── Habilidades ──────────────────────────────────────────────────
   void _addTechnicalSkill() {
     final value = _technicalSkillController.text.trim();
     if (value.isNotEmpty && !_technicalSkills.contains(value)) {
@@ -51,9 +68,8 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
     }
   }
 
-  void _removeTechnicalSkill(String skill) {
-    setState(() => _technicalSkills.remove(skill));
-  }
+  void _removeTechnicalSkill(String skill) =>
+      setState(() => _technicalSkills.remove(skill));
 
   void _addSoftSkill() {
     final value = _softSkillController.text.trim();
@@ -65,19 +81,17 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
     }
   }
 
-  void _removeSoftSkill(String skill) {
-    setState(() => _softSkills.remove(skill));
-  }
+  void _removeSoftSkill(String skill) =>
+      setState(() => _softSkills.remove(skill));
 
-  // ── Salvar candidato ─────────────────────────────────────────────
-  void _saveCandidate() {
+  // ── Salvar edição ────────────────────────────────────────────────
+  void _saveChanges() {
     if (!_formKey.currentState!.validate()) {
       setState(() => _currentStep = 0);
       return;
     }
 
-    final newCandidate = Candidate(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    final updated = widget.candidate.copyWith(
       name: _nameController.text.trim(),
       document: _documentController.text.trim(),
       email: _emailController.text.trim(),
@@ -89,10 +103,10 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Candidato cadastrado com sucesso! 🎉')),
+      const SnackBar(content: Text('Candidato atualizado com sucesso! ✅')),
     );
 
-    Navigator.pop(context, newCandidate);
+    Navigator.pop(context, updated);
   }
 
   // ── Build ────────────────────────────────────────────────────────
@@ -119,7 +133,13 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
       ),
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          decoration: const BoxDecoration(gradient: AppTheme.headerGradient),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF7C3AED), Color(0xFFE91E8C)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 56, 20, 16),
@@ -132,27 +152,31 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
                       borderRadius:
                           BorderRadius.circular(AppTheme.radiusMedium),
                     ),
-                    child: const Icon(Icons.person_add_alt_1_rounded,
+                    child: const Icon(Icons.edit_rounded,
                         color: Colors.white, size: 28),
                   ),
                   const SizedBox(width: 14),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Novo Candidato',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Editar Candidato',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Preencha as informações abaixo',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
-                      ),
-                    ],
+                        Text(
+                          widget.candidate.name,
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 13),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -160,7 +184,8 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
           ),
         ),
         title: _currentStep > 0
-            ? const Text('Novo Candidato')
+            ? Text('Editando: ${widget.candidate.name}',
+                overflow: TextOverflow.ellipsis)
             : null,
         collapseMode: CollapseMode.parallax,
       ),
@@ -170,9 +195,9 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
   Widget _buildStepper() {
     return Theme(
       data: Theme.of(context).copyWith(
-        colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: AppTheme.primary,
-            ),
+        colorScheme: Theme.of(context)
+            .colorScheme
+            .copyWith(primary: AppTheme.accent),
       ),
       child: Stepper(
         currentStep: _currentStep,
@@ -181,7 +206,7 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
           if (_currentStep < 2) {
             setState(() => _currentStep++);
           } else {
-            _saveCandidate();
+            _saveChanges();
           }
         },
         onStepCancel: () {
@@ -198,9 +223,12 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
             children: [
               Expanded(
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.accent,
+                  ),
                   onPressed: details.onStepContinue,
                   child: Text(
-                    _currentStep == 2 ? 'Cadastrar' : 'Continuar',
+                    _currentStep == 2 ? 'Salvar Alterações' : 'Continuar',
                   ),
                 ),
               ),
@@ -218,7 +246,8 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
                   ),
                   child: Text(
                     _currentStep == 0 ? 'Cancelar' : 'Voltar',
-                    style: const TextStyle(color: AppTheme.textSecondary),
+                    style:
+                        const TextStyle(color: AppTheme.textSecondary),
                   ),
                 ),
               ),
@@ -230,21 +259,18 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
             index: 0,
             title: 'Dados Pessoais',
             subtitle: 'Nome, CPF e e-mail',
-            icon: Icons.person_rounded,
             content: _buildPersonalDataStep(),
           ),
           _buildStep(
             index: 1,
             title: 'Formação',
             subtitle: 'Curso, ano e disponibilidade',
-            icon: Icons.school_rounded,
             content: _buildFormationStep(),
           ),
           _buildStep(
             index: 2,
             title: 'Habilidades',
             subtitle: 'Técnicas e comportamentais',
-            icon: Icons.star_rounded,
             content: _buildSkillsStep(),
           ),
         ],
@@ -256,12 +282,10 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
     required int index,
     required String title,
     required String subtitle,
-    required IconData icon,
     required Widget content,
   }) {
-    final isActive = _currentStep >= index;
     return Step(
-      isActive: isActive,
+      isActive: _currentStep >= index,
       state: _currentStep > index ? StepState.complete : StepState.indexed,
       title: Text(title, style: AppTheme.headingSmall),
       subtitle:
@@ -270,7 +294,7 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
     );
   }
 
-  // ── Step 1: Dados pessoais ───────────────────────────────────────
+  // ── Conteúdo dos steps (idêntico ao CreateScreen, reutilizável) ──
   Widget _buildPersonalDataStep() {
     return Column(
       children: [
@@ -319,7 +343,6 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
     );
   }
 
-  // ── Step 2: Formação ─────────────────────────────────────────────
   Widget _buildFormationStep() {
     return Column(
       children: [
@@ -328,7 +351,6 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
           decoration: AppTheme.inputDecoration(
             label: 'Curso',
             icon: Icons.school_outlined,
-            hint: 'Ex: Técnico em Informática para Internet',
           ),
           textCapitalization: TextCapitalization.words,
           validator: (v) =>
@@ -373,10 +395,13 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
             ),
             subtitle: Text(
-              _available ? 'Sim, disponível agora' : 'Não disponível no momento',
+              _available
+                  ? 'Sim, disponível agora'
+                  : 'Não disponível no momento',
               style: TextStyle(
                 fontSize: 12,
-                color: _available ? AppTheme.success : AppTheme.textSecondary,
+                color:
+                    _available ? AppTheme.success : AppTheme.textSecondary,
               ),
             ),
             value: _available,
@@ -388,7 +413,6 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
     );
   }
 
-  // ── Step 3: Habilidades ──────────────────────────────────────────
   Widget _buildSkillsStep() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,8 +476,8 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
             Expanded(
               child: TextField(
                 controller: controller,
-                decoration: AppTheme.inputDecoration(
-                    label: hint, icon: icon),
+                decoration:
+                    AppTheme.inputDecoration(label: hint, icon: icon),
                 onSubmitted: (_) => onAdd(),
                 textCapitalization: TextCapitalization.words,
               ),
@@ -468,7 +492,8 @@ class _CreateCandidateScreenState extends State<CreateCandidateScreen> {
                     BorderRadius.circular(AppTheme.radiusMedium),
               ),
               child: IconButton(
-                icon: const Icon(Icons.add_rounded, color: Colors.white),
+                icon:
+                    const Icon(Icons.add_rounded, color: Colors.white),
                 onPressed: onAdd,
               ),
             ),
